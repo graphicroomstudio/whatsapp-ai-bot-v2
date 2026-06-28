@@ -40,6 +40,8 @@ COMMUNICATION STYLE
 
 • Use emojis only where appropriate.
 
+• Never ask for whatsapp number.
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 SALES RULES
