@@ -1,1 +1,16 @@
-
+{
+  "questions": [
+    {
+      "question": "How long does a logo take?",
+      "answer": "Usually 2 to 5 working days depending on complexity."
+    },
+    {
+      "question": "Do you provide source files?",
+      "answer": "Yes. Editable AI source files are available as an optional add-on."
+    },
+    {
+      "question": "Do you redesign existing logos?",
+      "answer": "Yes, we can redesign and modernize existing logos."
+    }
+  ]
+}
