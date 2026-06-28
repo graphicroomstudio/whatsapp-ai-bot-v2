@@ -1,1 +1,34 @@
-
+{
+  "services": [
+    {
+      "name": "Logo Design",
+      "description": "Professional custom logo design for startups and businesses.",
+      "starting_price": "₹1499"
+    },
+    {
+      "name": "Brand Identity",
+      "description": "Complete branding including logo, color palette, typography and brand guidelines.",
+      "starting_price": "₹9999"
+    },
+    {
+      "name": "Social Media Design",
+      "description": "Instagram posts, Facebook posts, stories, banners and ad creatives.",
+      "starting_price": "₹1999"
+    },
+    {
+      "name": "Website Design",
+      "description": "Business websites, portfolio websites and landing pages.",
+      "starting_price": "₹9999"
+    },
+    {
+      "name": "Packaging Design",
+      "description": "Packaging, labels and product box design.",
+      "starting_price": "₹1999"
+    },
+    {
+      "name": "Print Design",
+      "description": "Visiting cards, brochures, flyers, menu cards, letterheads and bill books.",
+      "starting_price": "₹499"
+    }
+  ]
+}
