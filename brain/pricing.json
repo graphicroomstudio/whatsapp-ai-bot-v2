@@ -1,1 +1,7 @@
-
+{
+  "currency": "INR",
+  "advance_payment": "50%",
+  "remaining_payment": "50% before final delivery",
+  "source_file_price": "₹999",
+  "note": "Final pricing depends on project requirements and complexity."
+}
