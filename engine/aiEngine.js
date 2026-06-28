@@ -37,7 +37,7 @@ async function getReply(userId, userMessage) {
     const response = await client.chat.completions.create({
       model: "gpt-5.5",
       messages,
-      temperature: 0.7,
+     
 max_completion_tokens: 500    });
 
     const reply =
