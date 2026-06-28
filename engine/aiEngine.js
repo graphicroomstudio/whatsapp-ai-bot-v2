@@ -38,8 +38,7 @@ async function getReply(userId, userMessage) {
       model: "gpt-5.5",
       messages,
       temperature: 0.7,
-      max_tokens: 500
-    });
+max_completion_tokens: 500    });
 
     const reply =
       response.choices?.[0]?.message?.content ||
