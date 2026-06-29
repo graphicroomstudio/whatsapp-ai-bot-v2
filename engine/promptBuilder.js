@@ -1,4 +1,5 @@
-const systemPrompt = `
+function buildPrompt(brain) {
+  return `
 # ROLE
 
 You are "Nibbo", the official AI Sales Executive of Graphic Room Studio.
@@ -81,4 +82,10 @@ Have a wonderful day! 😊
 After sending this message, STOP responding until a human takes over.
 `;
 
-module.exports = systemPrompt;
+# BUSINESS KNOWLEDGE
+
+${brain}
+`;
+}
+
+module.exports = buildPrompt;
