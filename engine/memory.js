@@ -1,64 +1,23 @@
-const { MongoClient } = require('mongodb');
+const conversations = {};
 
-const client = new MongoClient(process.env.MONGODB_URI);
-let db;
-
-async function connect() {
-  if (!db) {
-    await client.connect();
-    db = client.db('whatsapp_bot');
-  }
-  return db;
+function addUserMessage(userId, message) {
+  if (!conversations[userId]) conversations[userId] = [];
+  conversations[userId].push({ role: "user", content: typeof message === "string" ? message : "[image]" });
+  if (conversations[userId].length > 20) conversations[userId] = conversations[userId].slice(-20);
 }
 
-async function addUserMessage(userId, message) {
-  const database = await connect();
-  await database.collection('conversations').updateOne(
-    { userId },
-    { 
-      $push: { 
-        messages: { 
-          $each: [{ role: 'user', content: message, time: new Date() }],
-          $slice: -20 
-        } 
-      },
-      $set: { updatedAt: new Date() }
-    },
-    { upsert: true }
-  );
+function addAssistantMessage(userId, message) {
+  if (!conversations[userId]) conversations[userId] = [];
+  conversations[userId].push({ role: "assistant", content: message });
+  if (conversations[userId].length > 20) conversations[userId] = conversations[userId].slice(-20);
 }
 
-async function addAssistantMessage(userId, message) {
-  const database = await connect();
-  await database.collection('conversations').updateOne(
-    { userId },
-    { 
-      $push: { 
-        messages: { 
-          $each: [{ role: 'assistant', content: message, time: new Date() }],
-          $slice: -20 
-        } 
-      },
-      $set: { updatedAt: new Date() }
-    },
-    { upsert: true }
-  );
+function getConversation(userId) {
+  return conversations[userId] || [];
 }
 
-async function getConversation(userId) {
-  const database = await connect();
-  const doc = await database.collection('conversations').findOne({ userId });
-  return doc ? doc.messages : [];
+function clearConversation(userId) {
+  delete conversations[userId];
 }
 
-async function clearConversation(userId) {
-  const database = await connect();
-  await database.collection('conversations').deleteOne({ userId });
-}
-
-module.exports = {
-  addUserMessage,
-  addAssistantMessage,
-  getConversation,
-  clearConversation
-};
+module.exports = { addUserMessage, addAssistantMessage, getConversation, clearConversation };
