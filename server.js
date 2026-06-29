@@ -156,3 +156,10 @@ app.listen(PORT, () => {
   console.log(`🌐 Running on Port ${PORT}`);
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 });
+const { setHumanActive, isHumanActive } = require("./humanActive");
+
+// Webhook mein — bot reply karne se pehle ye check karo:
+if (isHumanActive(from)) {
+  console.log(`👤 Human active for ${from}, bot skipping.`);
+  return res.sendStatus(200);
+});
