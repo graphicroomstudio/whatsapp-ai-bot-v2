@@ -2,14 +2,24 @@ const conversations = {};
 
 function addUserMessage(userId, message) {
   if (!conversations[userId]) conversations[userId] = [];
-  conversations[userId].push({ role: "user", content: typeof message === "string" ? message : "[image]" });
-  if (conversations[userId].length > 20) conversations[userId] = conversations[userId].slice(-20);
+  conversations[userId].push({ 
+    role: "user", 
+    content: typeof message === "string" ? message : "[image sent]" 
+  });
+  if (conversations[userId].length > 20) {
+    conversations[userId] = conversations[userId].slice(-20);
+  }
 }
 
 function addAssistantMessage(userId, message) {
   if (!conversations[userId]) conversations[userId] = [];
-  conversations[userId].push({ role: "assistant", content: message });
-  if (conversations[userId].length > 20) conversations[userId] = conversations[userId].slice(-20);
+  conversations[userId].push({ 
+    role: "assistant", 
+    content: message 
+  });
+  if (conversations[userId].length > 20) {
+    conversations[userId] = conversations[userId].slice(-20);
+  }
 }
 
 function getConversation(userId) {
