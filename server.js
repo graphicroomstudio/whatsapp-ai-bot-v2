@@ -86,9 +86,24 @@ app.post("/webhook", async (req, res) => {
       case "text":
         userMessage = message.text.body;
         break;
-      case "image":
-        userMessage = "The customer has sent an image. Acknowledge it politely and ask how Graphic Room Studio can help.";
-        break;
+     case "image":
+  const imageId = message.image.id;
+  const mediaResponse = await fetch(
+    `https://graph.facebook.com/v23.0/${imageId}`,
+    {
+      headers: { Authorization: `Bearer ${ACCESS_TOKEN}` }
+    }
+  );
+  const mediaData = await mediaResponse.json();
+  const imageUrl = mediaData.url;
+  const imageDownload = await fetch(imageUrl, {
+    headers: { Authorization: `Bearer ${ACCESS_TOKEN}` }
+  });
+  const imageBuffer = await imageDownload.arrayBuffer();
+  const base64Image = Buffer.from(imageBuffer).toString("base64");
+  const mimeType = message.image.mime_type || "image/jpeg";
+  userMessage = { type: "image", base64: base64Image, mime: mimeType };
+  break;
       case "video":
         userMessage = "The customer has sent a video. Acknowledge it politely and ask how Graphic Room Studio can help.";
         break;
