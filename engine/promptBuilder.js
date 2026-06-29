@@ -80,7 +80,7 @@ Thank you for choosing Graphic Room Studio.
 Have a wonderful day! 😊
 
 After sending this message, STOP responding until a human takes over.
-`;
+
 
 # BUSINESS KNOWLEDGE
 
