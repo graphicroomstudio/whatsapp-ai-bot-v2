@@ -9,15 +9,38 @@ const ACCESS_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 // =========================
-// HANDOVER / PAUSE SYSTEM
+// HUMAN ACTIVE TRACKING
 // =========================
-const pausedUsers = new Set(); // In-memory (resets on restart, theek hai)
+const lastHumanReply = {};
+
+function setHumanActive(userId) {
+  lastHumanReply[userId] = Date.now();
+  console.log(`👤 Human active set for ${userId}`);
+}
+
+function isHumanActive(userId, timeoutMinutes = 10) {
+  const last = lastHumanReply[userId];
+  if (!last) return false;
+  const diff = (Date.now() - last) / 1000 / 60;
+  return diff < timeoutMinutes;
+}
 
 // =========================
 // HOME
 // =========================
 app.get("/", (req, res) => {
   res.send("Graphic Room Studio WhatsApp AI Bot V2 🚀");
+});
+
+// =========================
+// ADMIN — Human Active Trigger
+// =========================
+app.get("/human-reply/:number", (req, res) => {
+  if (req.query.secret !== process.env.ADMIN_SECRET) {
+    return res.status(403).send("Unauthorized");
+  }
+  setHumanActive(req.params.number);
+  res.send(`✅ Bot paused 10 min for ${req.params.number}`);
 });
 
 // =========================
@@ -31,7 +54,6 @@ app.get("/webhook", (req, res) => {
     console.log("✅ Webhook Verified");
     return res.status(200).send(challenge);
   }
-  console.log("❌ Webhook Verification Failed");
   return res.sendStatus(403);
 });
 
@@ -44,43 +66,15 @@ app.post("/webhook", async (req, res) => {
     const change = entry?.changes?.[0]?.value;
     const message = change?.messages?.[0];
 
-    // ✅ Ignore status updates (delivered, read receipts)
     if (!message) return res.sendStatus(200);
 
     const from = message.from;
-    const myNumber = process.env.MY_NUMBER; // Tumhara apna WhatsApp number
 
     // =========================
-    // ADMIN COMMANDS (Tumhare apne messages)
+    // HUMAN ACTIVE CHECK
     // =========================
-    if (from === myNumber && message.type === "text") {
-      const text = message.text.body.trim().toLowerCase();
-
-      if (text.startsWith("pause ")) {
-        const targetNumber = text.replace("pause ", "").trim();
-        pausedUsers.add(targetNumber);
-        console.log(`⏸ Bot paused for ${targetNumber}`);
-        return res.sendStatus(200);
-      }
-
-      if (text.startsWith("resume ")) {
-        const targetNumber = text.replace("resume ", "").trim();
-        pausedUsers.delete(targetNumber);
-        console.log(`▶️ Bot resumed for ${targetNumber}`);
-        return res.sendStatus(200);
-      }
-
-      if (text === "paused list") {
-        console.log("⏸ Paused users:", [...pausedUsers]);
-        return res.sendStatus(200);
-      }
-    }
-
-    // =========================
-    // BOT PAUSED CHECK
-    // =========================
-    if (pausedUsers.has(from)) {
-      console.log(`⏸ Bot is paused for ${from}, skipping.`);
+    if (isHumanActive(from)) {
+      console.log(`👤 Human active for ${from}, bot skipping.`);
       return res.sendStatus(200);
     }
 
@@ -110,14 +104,12 @@ app.post("/webhook", async (req, res) => {
 
     console.log("📩", from, ":", userMessage);
 
-    // Ask AI
     const assistantReply = await getReply(from, userMessage);
     if (!assistantReply || assistantReply.trim() === "") {
       console.log("⚠ Empty reply from AI");
       return res.sendStatus(200);
     }
 
-    // Send WhatsApp Reply
     const response = await fetch(
       `https://graph.facebook.com/v23.0/${PHONE_NUMBER_ID}/messages`,
       {
@@ -135,13 +127,11 @@ app.post("/webhook", async (req, res) => {
     );
 
     const result = await response.json();
-    console.log("✅ WhatsApp Reply Sent");
-    console.log(result);
+    console.log("✅ WhatsApp Reply Sent", result);
     return res.sendStatus(200);
 
   } catch (err) {
-    console.error("❌ WEBHOOK ERROR");
-    console.error(err);
+    console.error("❌ WEBHOOK ERROR", err);
     return res.sendStatus(500);
   }
 });
@@ -155,11 +145,4 @@ app.listen(PORT, () => {
   console.log("🚀 Graphic Room Studio AI Bot V2");
   console.log(`🌐 Running on Port ${PORT}`);
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-});
-const { setHumanActive, isHumanActive } = require("./humanActive");
-
-// Webhook mein — bot reply karne se pehle ye check karo:
-if (isHumanActive(from)) {
-  console.log(`👤 Human active for ${from}, bot skipping.`);
-  return res.sendStatus(200);
 });
