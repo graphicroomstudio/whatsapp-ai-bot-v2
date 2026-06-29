@@ -25,13 +25,32 @@ async function getReply(userId, userMessage) {
     const systemPrompt = buildPrompt(brain);
 
     // Prepare Messages
-    const messages = [
+    let lastMessage;
+if (typeof userMessage === "object" && userMessage.type === "image") {
+  lastMessage = {
+    role: "user",
+    content: [
       {
-        role: "system",
-        content: systemPrompt
+        type: "image_url",
+        image_url: {
+          url: `data:${userMessage.mime};base64,${userMessage.base64}`
+        }
       },
-      ...conversation
-    ];
+      {
+        type: "text",
+        text: "The customer has sent this image as a design reference. Analyze the style, colors, and design elements. Ask relevant questions about their business and suggest the most suitable package."
+      }
+    ]
+  };
+} else {
+  lastMessage = { role: "user", content: userMessage };
+}
+
+const messages = [
+  { role: "system", content: systemPrompt },
+  ...conversation.slice(0, -1),
+  lastMessage
+];
 
     // Ask GPT
     const response = await client.chat.completions.create({
