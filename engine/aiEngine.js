@@ -10,14 +10,13 @@ const client = new OpenAI({
 async function getReply(userId, userMessage) {
   try {
     // Save customer message
-    await memory.addUserMessage(userId, userMessage);
+    memory.addUserMessage(userId, userMessage);
 
     // Load Business Brain
     const brain = loadAllBrain();
 
     // Load Previous Conversation
-    const conversationRaw = await memory.getConversation(userId);
-    const conversation = Array.isArray(conversationRaw) ? conversationRaw : [];
+    const conversation = memory.getConversation(userId);
 
     // System Prompt
     const systemPrompt = buildPrompt(brain);
@@ -61,14 +60,14 @@ async function getReply(userId, userMessage) {
       response.choices?.[0]?.message?.content ||
       "Sorry, I couldn't generate a response.";
 
-    // Save AI Reply
-    await memory.addAssistantMessage(userId, reply);
+    // Save AI reply
+    memory.addAssistantMessage(userId, reply);
 
     return reply;
+
   } catch (err) {
-    console.error("AI Engine Error");
-    console.error(err);
-    return "I'm sorry. Something went wrong while processing your request. Please try again in a moment.";
+    console.error("AI Engine Error:", err);
+    return "I'm sorry. Something went wrong. Please try again in a moment.";
   }
 }
 
