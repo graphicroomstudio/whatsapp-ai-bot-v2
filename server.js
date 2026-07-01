@@ -61,6 +61,29 @@ app.get("/webhook", (req, res) => {
 // RECEIVE WHATSAPP MESSAGE
 // =========================
 app.post("/webhook", async (req, res) => {
+
+// ===============================
+// BOT TIMING (9 PM - 8 AM)
+// ===============================
+
+const now = new Date();
+
+// India Time
+const indiaTime = new Date(
+  now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+);
+
+const hour = indiaTime.getHours();
+
+// Allowed: 9 PM (21) to 8 AM (8)
+const botActive = (hour >= 21 || hour < 8);
+
+if (!botActive) {
+    console.log("Bot is OFF (Day Time)");
+    return; // Din me koi reply nahi bhejega
+}
+
+  
   try {
     const entry = req.body.entry?.[0];
     const change = entry?.changes?.[0]?.value;
